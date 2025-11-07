@@ -14,7 +14,6 @@ public class ej4 {
 		for (int i = 0; i < num; i++) {
 			codSecreto[i] = (int) (Math.random() * 5) + 1;
 		}
-		System.out.println(Arrays.toString(codSecreto));
 		while (!Arrays.equals(codSecreto, intento)) {
 			System.out.println("introduzca los valores para adivinar (del 1 al 5)");
 			for (int i = 0; i < num; i++) {
