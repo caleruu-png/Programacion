@@ -66,9 +66,9 @@ public class Biblioteca {
 	 * para implementar esta ordenaci�n.
 	 */
 	public MaterialBibliografico[] getMaterialesOrdenados() {
-		MaterialBibliografico[] tablaordenada= new MaterialBibliografico[numMateriales];
-		for(int i=0;i<numMateriales;i++){
-			tablaordenada[i]=materiales[i];
+		MaterialBibliografico[] tablaordenada = new MaterialBibliografico[numMateriales];
+		for (int i = 0; i < numMateriales; i++) {
+			tablaordenada[i] = materiales[i];
 		}
 		Arrays.sort(tablaordenada);
 		return tablaordenada;
@@ -90,21 +90,31 @@ public class Biblioteca {
 	 */
 
 	public boolean agregarPrestamo(Prestamo prestamo, Usuario usuario) {
-	      for (int i = 0; i < numUsuarios; i++) {
+		boolean enc = false;
 
-	            for (int j = 0; j < numMateriales; j++) {
+		for (int i = 0; i < numMateriales; i++) {
 
-	                if (usuarios[i].equals(usuario) && materiales[j].equals(prestamo.getMaterialBibliografico())) {
+			if (prestamo.getMaterialBibliografico().equals(materiales[i])) {
+				enc = true;
+			}
 
-	                    if (prestamo.getMaterialBibliografico().prestado == false) {
+			if (prestamo.getMaterialBibliografico().equals(materiales[i]) && materiales[i].estaPrestado() == true) {
 
-	                        return true;
-	                    }
-	                }
-	            }
-	        }
+				return false;
+			}
+		}
 
-	        return false;
+		if (enc == false) {
+			return false;
+		}
+
+		for (int i = 0; i < numUsuarios; i++) {
+			if (usuarios[i].equals(usuario)) {
+				usuarios[i].agregarPrestamo(prestamo);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	// c)
@@ -114,8 +124,19 @@ public class Biblioteca {
 	 * biblioteca, e indica la fecha de devoluci�n en sus pr�stamos.
 	 */
 	public void devolver(MaterialBibliografico mat, LocalDate fechaDev) {
-
-		
+		for (int i = 0; i < numMateriales; i++) {
+			if (materiales[i].equals(mat)) {
+				materiales[i].devolver();
+			}
+		}
+		for (int i = 0; i < numUsuarios; i++) {
+			for (int j = 0; j < usuarios[i].getNumPrestamos(); j++) {
+				if (usuarios[i].getPrestamos()[j].getMaterialBibliografico().equals(mat)
+						&& usuarios[i].getPrestamos()[j].getFechaDevolucion() == null) {
+					usuarios[i].getPrestamos()[j].setFechaDevolucion(fechaDev);
+				}
+			}
+		}
 	}
 
 	// d)
@@ -127,7 +148,13 @@ public class Biblioteca {
 	 * fecha de devoluci�n, es que ese material no est� prestado.
 	 */
 	public void actualizaMaterialesPrestados() {
-
+		for (int i = 0; i < numUsuarios; i++) {
+			for (int j = 0; j < usuarios[i].getNumPrestamos(); j++) {
+				if (usuarios[i].getPrestamos()[j].getFechaDevolucion() == null) {
+					usuarios[i].getPrestamos()[j].getMaterialBibliografico().prestar();
+				}
+			}
+		}
 	}
 
 	// e)
@@ -136,7 +163,17 @@ public class Biblioteca {
 	 * que se pasa como par�metro.
 	 */
 	public Prestamo[] prestamosDeMaterial(MaterialBibliografico material) {
-		return null;
+		Prestamo[] prestamoMaterial = new Prestamo[10];
+		int numPrestamosInsert = 0;
+		for (int i = 0; i < numUsuarios; i++) {
+			for (int j = 0; j < usuarios[i].getNumPrestamos(); j++) {
+				if (usuarios[i].getPrestamos()[j].getMaterialBibliografico().equals(material)) {
+					prestamoMaterial[numPrestamosInsert++]= usuarios[i].getPrestamos()[j];
+				}
+			}
+		}
+
+		return Arrays.copyOf( prestamoMaterial, numPrestamosInsert);
 	}
 
 }
